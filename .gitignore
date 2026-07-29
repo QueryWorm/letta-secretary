@@ -1,0 +1,8 @@
+.env
+pgdata/
+*.log
+venv/
+__pycache__/
+lettabot/node_modules/
+lettabot/lettabot.yaml
+lettabot/data/
