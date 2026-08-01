@@ -46,6 +46,18 @@ services:
     restart: unless-stopped
     environment:
       LETTABOT_API_KEY: d21ccb3a6f74d562c4daf4106970398b604793d679985ca33080546f402e4f8f
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    ports:
+      - 4000:4000
+    volumes:
+      - ./litellm-config.yaml:/app/config.yaml
+    command:
+      - --config
+      - /app/config.yaml
+    env_file:
+      - .env
+    restart: unless-stopped
 volumes:
   lettabot-data:
   attachments-data:
