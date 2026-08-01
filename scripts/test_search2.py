@@ -1,0 +1,17 @@
+import os
+from letta_client import Letta
+from dotenv import load_dotenv
+
+load_dotenv()
+
+client = Letta(base_url="http://localhost:8283")
+AGENT_ID = os.getenv("LETTA_AGENT_ID")
+
+response = client.agents.messages.create(
+    agent_id=AGENT_ID,
+    messages=[{"role": "user", "content": "Кто больше всех выигрывал чемпионатов в MotoGP? Используй веб-поиск."}],
+)
+
+for msg in response.messages:
+    if msg.message_type == "assistant_message":
+        print(msg.content)

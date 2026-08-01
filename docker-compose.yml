@@ -8,23 +8,44 @@ services:
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     restart: unless-stopped
-
   letta-server:
     image: letta/letta:latest
     environment:
       LETTA_PG_URI: postgresql://letta:letta@letta-db:5432/letta
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       GROQ_API_KEY: ${GROQ_API_KEY}
+      CEREBRAS_API_KEY: ${CEREBRAS_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      SAMBANOVA_API_KEY: ${SAMBANOVA_API_KEY}
     ports:
       - "8283:8283"
+    volumes:
+      - attachments-data:/tmp/lettabot/attachments
     depends_on:
       - letta-db
     restart: unless-stopped
-
   searxng:
     image: searxng/searxng:latest
     ports:
       - "8080:8080"
     environment:
       - SEARXNG_BASE_URL=http://localhost:8080/
+    volumes:
+      - ./searxng/settings.yml:/etc/searxng/settings.yml
     restart: unless-stopped
+  lettabot:
+    build: ./lettabot
+    depends_on:
+      - letta-server
+    volumes:
+      - ./lettabot/lettabot.yaml:/app/lettabot.yaml
+      - lettabot-data:/app/data
+      - attachments-data:/tmp/lettabot/attachments
+    env_file:
+      - .env
+    restart: unless-stopped
+    environment:
+      LETTABOT_API_KEY: d21ccb3a6f74d562c4daf4106970398b604793d679985ca33080546f402e4f8f
+volumes:
+  lettabot-data:
+  attachments-data:
