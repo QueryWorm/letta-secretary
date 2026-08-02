@@ -6,3 +6,9 @@ __pycache__/
 lettabot/node_modules/
 lettabot/lettabot.yaml
 lettabot/data/
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+.beads/proxieddb/
