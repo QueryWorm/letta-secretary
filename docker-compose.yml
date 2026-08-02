@@ -41,11 +41,14 @@ services:
       - ./lettabot/lettabot.yaml:/app/lettabot.yaml
       - lettabot-data:/app/data
       - attachments-data:/tmp/lettabot/attachments
+      - lettabot-credentials:/root/.lettabot
     env_file:
       - .env
     restart: unless-stopped
     environment:
       LETTABOT_API_KEY: d21ccb3a6f74d562c4daf4106970398b604793d679985ca33080546f402e4f8f
+      OPENAI_API_KEY: sk-anything
+      OPENAI_TRANSCRIPTION_BASE_URL: http://litellm:4000
   litellm:
     image: ghcr.io/berriai/litellm:main-latest
     ports:
@@ -61,3 +64,4 @@ services:
 volumes:
   lettabot-data:
   attachments-data:
+  lettabot-credentials: {}

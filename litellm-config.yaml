@@ -1,0 +1,25 @@
+model_list:
+  - model_name: secretary-model
+    litellm_params:
+      model: cerebras/gemma-4-31b
+      api_key: os.environ/CEREBRAS_API_KEY
+  - model_name: secretary-model
+    litellm_params:
+      model: sambanova/gemma-4-31B-it
+      api_key: os.environ/SAMBANOVA_API_KEY
+  - model_name: secretary-model
+    litellm_params:
+      model: gemini/gemini-2.5-flash
+      api_key: os.environ/GEMINI_API_KEY
+  - model_name: whisper
+    litellm_params:
+      model: groq/whisper-large-v3
+      api_key: os.environ/GROQ_API_KEY
+    model_info:
+      mode: audio_transcription
+router_settings:
+  routing_strategy: usage-based-routing-v2
+  num_retries: 2
+  fallbacks: [{"secretary-model": ["secretary-model"]}]
+litellm_settings:
+  drop_params: true
