@@ -13,6 +13,10 @@ model_list:
       api_key: os.environ/GROQ_API_KEY
     model_info:
       mode: audio_transcription
+  - model_name: text-embedding-3-large
+    litellm_params:
+      model: gemini/gemini-embedding-001
+      api_key: os.environ/GEMINI_API_KEY
 router_settings:
   routing_strategy: usage-based-routing-v2
   num_retries: 2

@@ -16,6 +16,7 @@ services:
       GROQ_API_KEY: ${GROQ_API_KEY}
       CEREBRAS_API_KEY: ${CEREBRAS_API_KEY}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
+      LETTA_API_KEY: ${LETTA_API_KEY}
       SAMBANOVA_API_KEY: ${SAMBANOVA_API_KEY}
       TZ: Europe/Kyiv
     ports:
@@ -54,6 +55,24 @@ services:
       TZ: Europe/Kyiv
       LETTA_BASE_URL: http://letta-server:8283
       DATABASE_URL: postgresql://letta:letta@letta-db:5432/letta
+  letta-code-channels:
+    build: ./letta-code-channels
+    depends_on:
+      - letta-server
+      - litellm
+    env_file:
+      - .env
+    environment:
+      LETTA_BASE_URL: http://letta-server:8283
+      ENV_NAME: secretary-whatsapp
+      TZ: Europe/Kyiv
+      OPENAI_API_KEY: dummy
+      OPENAI_TRANSCRIPTION_BASE_URL: http://litellm:4000
+      OPENAI_TRANSCRIPTION_MODEL: whisper
+    volumes:
+      - letta-code-data:/root/.letta
+    command: ["server", "--channels", "whatsapp"]
+    restart: unless-stopped
   litellm:
     image: ghcr.io/berriai/litellm:main-latest
     ports:
@@ -74,3 +93,4 @@ volumes:
   attachments-data:
   lettabot-credentials: {}
   lettabot-todos: {}
+  letta-code-data: {}
