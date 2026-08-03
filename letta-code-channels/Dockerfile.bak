@@ -1,0 +1,16 @@
+FROM node:22-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 make g++ git curl wget jq ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN npm install -g @letta-ai/letta-code
+
+COPY patches/patch-transcription.js /tmp/patch-transcription.js
+RUN node /tmp/patch-transcription.js && rm /tmp/patch-transcription.js
+
+WORKDIR /root
+
+VOLUME ["/root/.letta"]
+
+ENTRYPOINT ["letta"]
