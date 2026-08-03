@@ -5,10 +5,6 @@ model_list:
       api_key: os.environ/CEREBRAS_API_KEY
   - model_name: secretary-model
     litellm_params:
-      model: sambanova/gemma-4-31B-it
-      api_key: os.environ/SAMBANOVA_API_KEY
-  - model_name: secretary-model
-    litellm_params:
       model: gemini/gemini-2.5-flash
       api_key: os.environ/GEMINI_API_KEY
   - model_name: whisper

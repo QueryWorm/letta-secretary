@@ -17,6 +17,7 @@ services:
       CEREBRAS_API_KEY: ${CEREBRAS_API_KEY}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       SAMBANOVA_API_KEY: ${SAMBANOVA_API_KEY}
+      TZ: Europe/Kyiv
     ports:
       - "8283:8283"
     volumes:
@@ -42,6 +43,7 @@ services:
       - lettabot-data:/app/data
       - attachments-data:/tmp/lettabot/attachments
       - lettabot-credentials:/root/.lettabot
+      - lettabot-todos:/app/todos
     env_file:
       - .env
     restart: unless-stopped
@@ -49,6 +51,9 @@ services:
       LETTABOT_API_KEY: d21ccb3a6f74d562c4daf4106970398b604793d679985ca33080546f402e4f8f
       OPENAI_API_KEY: sk-anything
       OPENAI_TRANSCRIPTION_BASE_URL: http://litellm:4000
+      TZ: Europe/Kyiv
+      LETTA_BASE_URL: http://letta-server:8283
+      DATABASE_URL: postgresql://letta:letta@letta-db:5432/letta
   litellm:
     image: ghcr.io/berriai/litellm:main-latest
     ports:
@@ -61,7 +66,11 @@ services:
     env_file:
       - .env
     restart: unless-stopped
+    environment:
+      TZ: Europe/Kyiv
+      LITELLM_LOG: DEBUG
 volumes:
   lettabot-data:
   attachments-data:
   lettabot-credentials: {}
+  lettabot-todos: {}
