@@ -18,6 +18,8 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       LETTA_API_KEY: ${LETTA_API_KEY}
       SAMBANOVA_API_KEY: ${SAMBANOVA_API_KEY}
+      COHERE_API_KEY: ${COHERE_API_KEY}
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY}
       TZ: Europe/Kyiv
     ports:
       - "8283:8283"
@@ -35,26 +37,6 @@ services:
     volumes:
       - ./searxng/settings.yml:/etc/searxng/settings.yml
     restart: unless-stopped
-  lettabot:
-    build: ./lettabot
-    depends_on:
-      - letta-server
-    volumes:
-      - ./lettabot/lettabot.yaml:/app/lettabot.yaml
-      - lettabot-data:/app/data
-      - attachments-data:/tmp/lettabot/attachments
-      - lettabot-credentials:/root/.lettabot
-      - lettabot-todos:/app/todos
-    env_file:
-      - .env
-    restart: unless-stopped
-    environment:
-      LETTABOT_API_KEY: d21ccb3a6f74d562c4daf4106970398b604793d679985ca33080546f402e4f8f
-      OPENAI_API_KEY: sk-anything
-      OPENAI_TRANSCRIPTION_BASE_URL: http://litellm:4000
-      TZ: Europe/Kyiv
-      LETTA_BASE_URL: http://letta-server:8283
-      DATABASE_URL: postgresql://letta:letta@letta-db:5432/letta
   letta-code-channels:
     build: ./letta-code-channels
     depends_on:
@@ -71,7 +53,7 @@ services:
       OPENAI_TRANSCRIPTION_MODEL: whisper
     volumes:
       - letta-code-data:/root/.letta
-    command: ["server", "--channels", "whatsapp"]
+    command: ["server", "--channels", "whatsapp", "--debug"]
     restart: unless-stopped
   litellm:
     image: ghcr.io/berriai/litellm:main-latest
@@ -89,8 +71,5 @@ services:
       TZ: Europe/Kyiv
       LITELLM_LOG: DEBUG
 volumes:
-  lettabot-data:
   attachments-data:
-  lettabot-credentials: {}
-  lettabot-todos: {}
   letta-code-data: {}
