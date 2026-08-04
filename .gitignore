@@ -12,3 +12,4 @@ lettabot/data/
 *.db
 .beads-credential-key
 .beads/proxieddb/
+litellm-config.yaml.bak*
