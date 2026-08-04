@@ -37,6 +37,7 @@ services:
     volumes:
       - ./searxng/settings.yml:/etc/searxng/settings.yml
     restart: unless-stopped
+  lettabot:
   letta-code-channels:
     build: ./letta-code-channels
     depends_on:
@@ -53,7 +54,7 @@ services:
       OPENAI_TRANSCRIPTION_MODEL: whisper
     volumes:
       - letta-code-data:/root/.letta
-    command: ["server", "--channels", "whatsapp,telegram", "--debug"]
+    command: ["server", "--channels", "whatsapp", "--debug"]
     restart: unless-stopped
   litellm:
     image: ghcr.io/berriai/litellm:main-latest
@@ -71,5 +72,8 @@ services:
       TZ: Europe/Kyiv
       LITELLM_LOG: DEBUG
 volumes:
+  lettabot-data:
   attachments-data:
+  lettabot-credentials: {}
+  lettabot-todos: {}
   letta-code-data: {}
