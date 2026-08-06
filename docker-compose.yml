@@ -12,6 +12,8 @@ services:
     image: letta/letta:latest
     environment:
       LETTA_PG_URI: postgresql://letta:letta@letta-db:5432/letta
+      OPENAI_API_BASE: http://litellm:4000/v1
+      OPENAI_API_KEY: dummy
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       GROQ_API_KEY: ${GROQ_API_KEY}
       CEREBRAS_API_KEY: ${CEREBRAS_API_KEY}
@@ -27,6 +29,7 @@ services:
       - attachments-data:/tmp/lettabot/attachments
     depends_on:
       - letta-db
+      - litellm
     restart: unless-stopped
   searxng:
     image: searxng/searxng:latest
@@ -53,7 +56,7 @@ services:
       OPENAI_TRANSCRIPTION_MODEL: whisper
     volumes:
       - letta-code-data:/root/.letta
-    command: ["server", "--channels", "whatsapp,telegram", "--debug"]
+    command: ["server", "--channels", "whatsapp", "--debug"]
     restart: unless-stopped
   litellm:
     image: ghcr.io/berriai/litellm:main-latest
@@ -69,7 +72,7 @@ services:
     restart: unless-stopped
     environment:
       TZ: Europe/Kyiv
-      LITELLM_LOG: DEBUG
+      LITELLM_LOG: WARNING
 volumes:
   attachments-data:
   letta-code-data: {}

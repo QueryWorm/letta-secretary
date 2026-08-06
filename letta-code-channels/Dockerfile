@@ -1,8 +1,11 @@
 FROM node:22-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 make g++ git curl wget jq ca-certificates \
+    python3 python3-pip python3-venv make g++ git curl wget jq ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+RUN python3 -m venv /opt/tts-venv \
+    && /opt/tts-venv/bin/pip install --no-cache-dir edge-tts \
+    && ln -s /opt/tts-venv/bin/edge-tts /usr/local/bin/edge-tts
 
 RUN npm install -g @letta-ai/letta-code@0.30.3 \
     && python3 - <<'PY'

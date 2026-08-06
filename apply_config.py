@@ -1,8 +1,11 @@
+import json
 import os
 import re
+import urllib.request
+
 import yaml
-from letta_client import Letta
 from dotenv import load_dotenv
+from letta_client import Letta
 
 load_dotenv()
 client = Letta(base_url="http://localhost:8283")
@@ -29,6 +32,44 @@ if agent.llm_config.handle != config["model"]:
     client.agents.update(agent_id=AGENT_ID, model=config["model"])
 else:
     print(f"Model OK: {config['model']}")
+
+# --- Context window + compaction (via raw API; letta_client lacks these fields) ---
+agent_id = AGENT_ID
+desired_cwl = config.get("context_window_limit")
+desired_cs = config.get("compaction_settings")
+req = urllib.request.Request(
+    f"http://localhost:8283/v1/agents/{agent_id}",
+    headers={"Authorization": f"Bearer {os.environ['LETTA_API_KEY']}", "Content-Type": "application/json"},
+)
+state = json.load(urllib.request.urlopen(req, timeout=15))
+current_cwl = (state.get("llm_config") or {}).get("context_window")
+current_cs = state.get("compaction_settings") or {}
+patch = {}
+if desired_cwl is not None and current_cwl != desired_cwl:
+    print(f"context_window_limit: {current_cwl} -> {desired_cwl}, updating...")
+    patch["context_window_limit"] = desired_cwl
+else:
+    print(f"context_window_limit OK: {current_cwl}")
+if desired_cs is not None:
+    current_cs_model = current_cs.get("model")
+    if isinstance(current_cs_model, dict):
+        current_cs_model = current_cs_model.get("model")
+    if current_cs_model != desired_cs.get("model"):
+        print(f"compaction model: {current_cs_model} -> {desired_cs.get('model')}, updating...")
+        patch["compaction_settings"] = desired_cs
+    else:
+        print(f"compaction model OK: {current_cs_model}")
+else:
+    print("compaction_settings not set in config")
+if patch:
+    data = json.dumps(patch).encode()
+    req = urllib.request.Request(
+        f"http://localhost:8283/v1/agents/{agent_id}",
+        data=data,
+        method="PATCH",
+        headers={"Authorization": f"Bearer {os.environ['LETTA_API_KEY']}", "Content-Type": "application/json"},
+    )
+    urllib.request.urlopen(req, timeout=15)
 
 # --- Memory blocks ---
 for label, desired_value in config["memory"].items():

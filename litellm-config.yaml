@@ -1,29 +1,31 @@
 model_list:
   - model_name: secretary-model
     litellm_params:
-      model: cerebras/gemma-4-31b
-      api_key: os.environ/CEREBRAS_API_KEY
-
-  - model_name: secretary-model
+      model: groq/llama-3.3-70b-versatile
+      api_key: os.environ/GROQ_API_KEY
+  - model_name: secretary-model-fallback
     litellm_params:
-      model: mistral/mistral-small-latest
-      api_key: os.environ/MISTRAL_API_KEY
-
+      model: openrouter/openai/gpt-oss-20b:free
+      api_key: os.environ/OPENROUTER_API_KEY
+  - model_name: secretary-summarizer
+    litellm_params:
+      model: groq/groq/compound
+      api_key: os.environ/GROQ_API_KEY
   - model_name: whisper
     litellm_params:
       model: groq/whisper-large-v3
       api_key: os.environ/GROQ_API_KEY
     model_info:
       mode: audio_transcription
-
   - model_name: text-embedding-3-large
     litellm_params:
       model: gemini/gemini-embedding-001
       api_key: os.environ/GEMINI_API_KEY
-
 router_settings:
   routing_strategy: usage-based-routing-v2
   num_retries: 1
-
 litellm_settings:
   drop_params: true
+  fallbacks:
+    - secretary-model:
+        - secretary-model-fallback

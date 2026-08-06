@@ -1,6 +1,9 @@
 agent_id: agent-d622b194-88c6-4972-8421-fda92c1753a0
 model: openai-proxy/secretary-model
 embedding: letta/letta-free
+context_window_limit: 8000
+compaction_settings:
+  model: openai-proxy/secretary-summarizer
 memory:
   human: |
     Игорь — технический специалист из Харькова, работает с Excel/Sheets, пентестом, Linux.
