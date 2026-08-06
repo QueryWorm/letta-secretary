@@ -14,19 +14,11 @@ services:
       LETTA_PG_URI: postgresql://letta:letta@letta-db:5432/letta
       OPENAI_API_BASE: http://litellm:4000/v1
       OPENAI_API_KEY: dummy
-      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
-      GROQ_API_KEY: ${GROQ_API_KEY}
-      CEREBRAS_API_KEY: ${CEREBRAS_API_KEY}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       LETTA_API_KEY: ${LETTA_API_KEY}
-      SAMBANOVA_API_KEY: ${SAMBANOVA_API_KEY}
-      COHERE_API_KEY: ${COHERE_API_KEY}
-      MISTRAL_API_KEY: ${MISTRAL_API_KEY}
       TZ: Europe/Kyiv
     ports:
       - "8283:8283"
-    volumes:
-      - attachments-data:/tmp/lettabot/attachments
     depends_on:
       - letta-db
       - litellm
@@ -74,5 +66,4 @@ services:
       TZ: Europe/Kyiv
       LITELLM_LOG: WARNING
 volumes:
-  attachments-data:
   letta-code-data: {}
