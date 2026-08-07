@@ -40,6 +40,9 @@ PY
 COPY patches/patch-gateway-send.py /tmp/patch-gateway-send.py
 RUN python3 /tmp/patch-gateway-send.py && rm /tmp/patch-gateway-send.py
 
+COPY patches/patch-turn-error.py /tmp/patch-turn-error.py
+RUN python3 /tmp/patch-turn-error.py && rm /tmp/patch-turn-error.py
+
 WORKDIR /root
 
 VOLUME ["/root/.letta"]

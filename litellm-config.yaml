@@ -7,6 +7,10 @@ model_list:
     litellm_params:
       model: cerebras/gemma-4-31b
       api_key: os.environ/CEREBRAS_API_KEY
+  - model_name: secretary-model-fallback-2
+    litellm_params:
+      model: sambanova/Meta-Llama-3.3-70B-Instruct
+      api_key: os.environ/SAMBANOVA_API_KEY
   - model_name: secretary-summarizer
     litellm_params:
       model: cerebras/gpt-oss-120b
@@ -29,3 +33,4 @@ litellm_settings:
   fallbacks:
     - secretary-model:
         - secretary-model-fallback
+        - secretary-model-fallback-2
