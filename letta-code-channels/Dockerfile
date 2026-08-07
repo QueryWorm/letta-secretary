@@ -37,6 +37,9 @@ p.write_text(s.replace(old, new, 1))
 print("OK: whatsapp image imageDataBase64 patch applied")
 PY
 
+COPY patches/patch-gateway-send.py /tmp/patch-gateway-send.py
+RUN python3 /tmp/patch-gateway-send.py && rm /tmp/patch-gateway-send.py
+
 WORKDIR /root
 
 VOLUME ["/root/.letta"]

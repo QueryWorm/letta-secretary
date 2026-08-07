@@ -46,6 +46,7 @@ services:
       OPENAI_API_KEY: dummy
       OPENAI_TRANSCRIPTION_BASE_URL: http://litellm:4000
       OPENAI_TRANSCRIPTION_MODEL: whisper
+      LETTA_INHERITED_CHANNEL_CONTEXT: '{"channelToolScope":{"channels":[{"channelId":"whatsapp","accountId":"f3ebe44a-27b7-4e92-a83f-030458a194d8"}]}}'
     volumes:
       - letta-code-data:/root/.letta
     command: ["server", "--channels", "whatsapp", "--debug"]
