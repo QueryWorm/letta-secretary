@@ -23,21 +23,14 @@ class LettaClient:
         last_exc = None
         for attempt in range(self.max_retries):
             try:
-                if method == "GET":
-                    resp = requests.get(url, headers=self._headers(), timeout=30, **kwargs)
-                elif method == "POST":
-                    resp = requests.post(url, headers=self._headers(), timeout=30, **kwargs)
-                elif method == "DELETE":
-                    resp = requests.delete(url, headers=self._headers(), timeout=30, **kwargs)
-                else:
-                    resp = requests.request(method, url, headers=self._headers(), timeout=30, **kwargs)
+                resp = self.session.request(method, url, timeout=30, **kwargs)
                 if resp.status_code < 500:
                     resp.raise_for_status()
                     return resp.json() if resp.content else {}
                 last_exc = Exception(f"HTTP {resp.status_code}: {resp.text[:200]}")
             except requests.exceptions.RequestException as e:
                 last_exc = e
-            if attempt < self.max_retries:
+            if attempt < self.max_retries - 1:
                 time.sleep(2 ** attempt)
         raise last_exc
 
@@ -60,14 +53,14 @@ class LettaClient:
         return result if isinstance(result, list) else []
 
     def delete_source_file(self, source_id: str, file_id: str) -> None:
-        self._request("DELETE", f"/v1/sources/{source_id}/files/{file_id}")
+        self._request("DELETE", f"/v1/sources/{source_id}/{file_id}")
 
     def upload_file(self, source_id: str, file_path: str, name: Optional[str] = None) -> dict:
         with open(file_path, "rb") as f:
             files = {"file": (name or os.path.basename(file_path), f)}
             params = {"duplicate_handling": "replace"}
             url = f"{self.base_url}/v1/sources/{source_id}/upload"
-            resp = requests.post(url, headers=self._headers(), files=files, params=params, timeout=60)
+            resp = self.session.post(url, files=files, params=params, timeout=60)
             resp.raise_for_status()
             return resp.json()
 
