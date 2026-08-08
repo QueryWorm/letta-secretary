@@ -55,7 +55,8 @@ def test_upload_file(client, tmp_path):
         result = client.upload_file("src-123", str(test_file))
         assert result["id"] == "file-1"
         call_args = mock_post.call_args
-        assert "files" in call_args.args[0]
+        assert "/upload" in call_args.args[0]
+        assert call_args.kwargs["params"] == {"duplicate_handling": "replace"}
 
 
 def test_list_source_files(client):

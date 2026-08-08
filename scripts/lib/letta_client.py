@@ -65,9 +65,9 @@ class LettaClient:
     def upload_file(self, source_id: str, file_path: str, name: Optional[str] = None) -> dict:
         with open(file_path, "rb") as f:
             files = {"file": (name or os.path.basename(file_path), f)}
-            data = {"duplicate_handling": "replace"}
-            url = f"{self.base_url}/v1/sources/{source_id}/files"
-            resp = requests.post(url, headers=self._headers(), files=files, data=data, timeout=60)
+            params = {"duplicate_handling": "replace"}
+            url = f"{self.base_url}/v1/sources/{source_id}/upload"
+            resp = requests.post(url, headers=self._headers(), files=files, params=params, timeout=60)
             resp.raise_for_status()
             return resp.json()
 
