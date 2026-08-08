@@ -38,7 +38,6 @@ class LettaClient:
         body = {
             "name": name,
             "embedding": embedding_handle,
-            "embedding_dim": embedding_dim,
             "embedding_chunk_size": embedding_chunk_size,
         }
         result = self._request("POST", "/v1/sources/", json=body)
