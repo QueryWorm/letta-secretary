@@ -44,7 +44,7 @@ new_b = (
     "  try {\n"
     f"    const __whitelist = new Set({list(WHITELIST)!r});\n"
     "    const __tsMap = globalThis.__inboundTs;\n"
-    "    if (input && typeof input.message === \"string\" && input.action !== \"react\" && input.action !== \"remove\" && input.action !== \"download-file\" && !input.message.includes(TAG_MARKER) && __whitelist.has(String(chatId)) && __tsMap && __tsMap.has(String(chatId))) {\n"
+    f"    if (input && typeof input.message === \"string\" && input.action !== \"react\" && input.action !== \"remove\" && input.action !== \"download-file\" && !input.message.includes({TAG_MARKER!r}) && __whitelist.has(String(chatId)) && __tsMap && __tsMap.has(String(chatId))) {{\n"
     f"      const __lat = ((Date.now() - __tsMap.get(String(chatId))) / 1000).toFixed(1);\n"
     f"      input.message = input.message + \"\\n\\n[model: {MODEL_NAME} | latency: \" + __lat + \"s]\";\n"
     "      __tsMap.delete(String(chatId));\n"
