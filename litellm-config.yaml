@@ -35,6 +35,8 @@ router_settings:
   num_retries: 1
 litellm_settings:
   drop_params: true
+  json_logs: true
+  success_callback: ["logging"]
   fallbacks:
     - secretary-model:
         - secretary-model-fallback

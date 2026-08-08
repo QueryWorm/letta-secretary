@@ -72,6 +72,6 @@ services:
     restart: unless-stopped
     environment:
       TZ: Europe/Kyiv
-      LITELLM_LOG: WARNING
+      LITELLM_LOG: INFO
 volumes:
   letta-code-data: {}
