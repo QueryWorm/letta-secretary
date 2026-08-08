@@ -13,7 +13,7 @@ from pathlib import Path
 from datetime import datetime, timedelta, timezone
 
 from scripts.lib.letta_client import LettaClient
-from scripts.lib.extract import split_sessions, extract_success_path, render_markdown, litellm_chat
+from scripts.lib.extract import split_sessions, extract_success_path, render_markdown
 
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -64,7 +64,7 @@ def _upload_vault_files(client: LettaClient, source_id: str, vault_files: list[P
     return uploaded
 
 
-def _process_chats(client: LettaClient, source_id: str, agent_id: str, days: int, litellm_model: str) -> int:
+def _process_chats(client: LettaClient, source_id: str, agent_id: str, days: int) -> int:
     log.info(f"fetching messages for agent {agent_id} (last {days} days)...")
     raw = client.list_messages(agent_id, limit=2000)
     recent = _filter_messages(raw, days)
@@ -93,7 +93,7 @@ def _process_chats(client: LettaClient, source_id: str, agent_id: str, days: int
     return uploaded
 
 
-def run_ingest(vault: str, days: int, source_name: str, create: bool, agent_id: str, litellm_model: str = "secretary-model") -> int:
+def run_ingest(vault: str, days: int, source_name: str, create: bool, agent_id: str) -> int:
     client = LettaClient()
     vault_path = Path(vault).expanduser()
     if not vault_path.is_dir():
@@ -120,7 +120,7 @@ def run_ingest(vault: str, days: int, source_name: str, create: bool, agent_id: 
     log.info(f"  found {len(vault_files)} markdown files")
     uploaded_vault = _upload_vault_files(client, source_id, vault_files)
     log.info(f"  uploaded {uploaded_vault}/{len(vault_files)} vault files")
-    uploaded_chats = _process_chats(client, source_id, agent_id, days, litellm_model)
+    uploaded_chats = _process_chats(client, source_id, agent_id, days)
     log.info(f"  uploaded {uploaded_chats} chat extracts")
     log.info(f"done. source_id={source_id}")
     return 0
@@ -133,9 +133,8 @@ def main():
     parser.add_argument("--source", default=DEFAULT_SOURCE, help="Source name (default: personal_kb)")
     parser.add_argument("--create", action="store_true", help="Create new source (default: reuse existing)")
     parser.add_argument("--agent-id", default=os.environ.get("LETTA_AGENT_ID", DEFAULT_AGENT_ID))
-    parser.add_argument("--litellm-model", default="secretary-model")
     args = parser.parse_args()
-    sys.exit(run_ingest(args.vault, args.days, args.source, args.create, args.agent_id, args.litellm_model))
+    sys.exit(run_ingest(args.vault, args.days, args.source, args.create, args.agent_id))
 
 
 if __name__ == "__main__":

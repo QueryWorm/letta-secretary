@@ -15,9 +15,6 @@ class LettaClient:
         self.session = requests.Session()
         self.session.headers.update({"Authorization": f"Bearer {self.api_key}"})
 
-    def _headers(self) -> dict:
-        return {"Authorization": f"Bearer {self.api_key}"}
-
     def _request(self, method: str, path: str, **kwargs) -> dict:
         url = f"{self.base_url}{path}"
         last_exc = None
