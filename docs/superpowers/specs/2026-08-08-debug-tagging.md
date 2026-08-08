@@ -1,109 +1,110 @@
-# Debug Tagging in Outgoing Messages — Design
+# Debug-тэг в исходящих сообщениях — Дизайн
 
-**Date:** 2026-08-08
-**Status:** approved
-**Scope:** temporary debug feature, will be removed
+**Дата:** 2026-08-08
+**Статус:** утверждён
+**Срок:** временная debug-фича, будет удалена
 
-## Goal
+## Цель
 
-Append a small debug tag to outgoing agent messages in WhatsApp and Telegram,
-showing which `model_name` and how much time elapsed between inbound user
-message and outgoing MessageChannel.
+Дописывать маленький debug-тэг в исходящие сообщения агента в WhatsApp и
+Telegram: показывать `model_name` и сколько секунд прошло между приходом
+входящего user message и отправкой MessageChannel.
 
-## Why
+## Зачем
 
-Currently the user has no way to see from the chat itself how long the agent
-took to answer or which logical model answered. LiteLLM logs show real
-provider models, but the user wants the tag inline for quick eyeballing.
+Сейчас пользователь не видит в самом чате, сколько агент думал и какой
+логический `model_name` (alias в LiteLLM) ответил. Реальные провайдеры
+видны в JSON-логах LiteLLM, но для быстрой оценки удобнее иметь тэг
+прямо в сообщении.
 
-## Tag format
+## Формат тэга
 
 ```
 [model: secretary-model | latency: 2.4s]
 ```
 
-- `model`: the `model_name` from `parentScope` (currently always
-  `secretary-model` — the LiteLLM alias; the user can map it to real providers
-  in their head from `litellm-config.yaml`).
-- `latency`: seconds between the moment the inbound user message arrived in
-  the channel and the moment the outgoing `MessageChannel` is being dispatched.
-  Format: `<X.Ys>` with one decimal.
+- `model` — `model_name` из `parentScope` (сейчас всегда `secretary-model`
+  — алиас LiteLLM; пользователь сам мапит в реальный провайдер по
+  `litellm-config.yaml`).
+- `latency` — секунды между моментом, когда входящее user message пришло
+  в канал, и моментом, когда исходящий `MessageChannel` диспатчится.
+  Формат: `<X.Ys>`, один знак после точки.
 
-The tag is appended after a blank line at the end of the message body.
+Тэг дописывается после пустой строки в конце тела сообщения.
 
-## Scope of effect
+## Кого затрагивает
 
-- **Only** the two chat_ids belonging to the user:
+- **Только** два chat_id пользователя:
   - WhatsApp: `380975907324`
   - Telegram: `322910508`
-- All other recipients (e.g. cron to other addresses, future channels) are
-  untouched.
+- Все остальные адресаты (cron в другие адреса, будущие каналы) — не
+  трогаем.
 
-## Architecture
+## Архитектура
 
-Single patch in JS bundle `letta-code-channels/letta.js`. No new IPC, no
-shared volume, no `letta-server` changes.
+Один патч в JS-бандле `letta-code-channels/letta.js`. Никакого нового IPC,
+никаких shared volume, никаких правок в `letta-server`.
 
-## Data flow
+## Поток данных
 
-1. **Inbound** — `handleInboundMessage` in the channel adapter records
-   `Date.now()` into an in-memory map keyed by `chatId`.
-2. **Outbound** — `executeMessageChannel` (or directly in
-   `buildMessageChannelRequest`) reads the timestamp for the target
-   `chatId`, computes the delta, and appends the tag to the message body if
-   the `chatId` is in the user's whitelist.
+1. **Inbound** — `handleInboundMessage` в адаптере канала пишет
+   `Date.now()` в in-memory map с ключом `chatId`.
+2. **Outbound** — `executeMessageChannel` (или прямо в
+   `buildMessageChannelRequest`) читает timestamp по `chatId`, считает
+   дельту, дописывает тэг в тело сообщения, если `chatId` в whitelist
+   пользователя.
 
-## Components
+## Компоненты
 
-### Patch file
+### Файл патча
 
 - `letta-code-channels/patches/patch-debug-tagging.py`
-  - Patches `handleInboundMessage` to record `globalThis.__inboundTs[chatId] = Date.now()`
-  - Patches `buildMessageChannelRequest` to read the timestamp and append the tag
-  - Idempotent: detects already-applied state and bails out
-  - Backs up original to `letta.js.bak` before patching
+  - Патчит `handleInboundMessage`: пишет
+    `globalThis.__inboundTs[chatId] = Date.now()`
+  - Патчит `buildMessageChannelRequest`: читает timestamp и дописывает тэг
+  - Идемпотентно: при повторном запуске на уже патченном бандле — выход
+  - Бэкапит оригинал в `letta.js.bak` перед правкой
 
-### Bundle location
+### Расположение бандла
 
-- `/usr/local/lib/node_modules/@letta-ai/letta-code/letta.js` (inside the
-  `letta-code-channels` container)
-- The patch script accepts the path as argv[1], defaulting to the above.
+- `/usr/local/lib/node_modules/@letta-ai/letta-code/letta.js` (внутри
+  контейнера `letta-code-channels`)
+- Скрипт принимает путь как `argv[1]`, по умолчанию — этот путь.
 
-### Docker build
+### Сборка Docker
 
-- The patch is applied **at container start**, not at image build. This is
-  consistent with existing patches (`patch-gateway-send.py`,
+- Патч применяется **при старте контейнера**, а не при сборке образа. Это
+  консистентно с уже существующими патчами (`patch-gateway-send.py`,
   `patch-turn-error.py`).
-- Patch script is mounted into the container or baked into the image. The
-  current `Dockerfile` already runs all patches; add the new one there.
+- Скрипт патча монтируется в контейнер или запекается в образ. Текущий
+  `Dockerfile` уже запускает все патчи; добавить туда новый.
 
-## Error handling
+## Обработка ошибок
 
-- If `__inboundTs[chatId]` is missing (e.g. proactive cron with no prior
-  inbound), no tag is appended.
-- If `parentScope` is missing, fall back to `model = "secretary-model"`
-  (which is what the user wants anyway).
-- If the message already contains `[model:` (idempotency), do not append
-  again. This protects against double-send scenarios.
+- Если `__inboundTs[chatId]` нет (например, cron без предшествующего
+  inbound) — тэг не дописывается.
+- Если `parentScope` отсутствует — fallback на
+  `model = "secretary-model"` (это и так то, что нужно пользователю).
+- Если сообщение уже содержит `[model:` (идемпотентность) — не дописывать
+  повторно. Защита от двойной отправки.
 
-## Testing
+## Тестирование
 
-- Send "ping" to WhatsApp and Telegram from the user's accounts.
-- Confirm the response contains the tag with a sensible latency value.
-- Send two messages in a row — confirm each gets its own correct latency
-  (not a cumulative one).
-- Send a cron reminder — confirm the tag is **not** appended (cron → not in
-  the chat whitelist in the current design).
+- Отправить «ping» в WhatsApp и Telegram с аккаунтов пользователя.
+- Проверить, что в ответе есть тэг с разумным `latency`.
+- Отправить два сообщения подряд — проверить, что у каждого свой
+  корректный `latency` (не накопительный).
+- Отправить cron-напоминание — проверить, что тэг **не** дописывается
+  (cron → не в whitelist по текущему дизайну).
 
-## Removal
+## Удаление
 
-This is a temporary debug feature. To remove:
+Это временная debug-фича. Чтобы удалить:
 
-1. Delete `letta-code-channels/patches/patch-debug-tagging.py`.
-2. Remove the patch invocation from `Dockerfile`.
-3. Rebuild the `letta-code-channels` image.
-4. The original bundle (pre-patch) is at
-   `letta.js.bak` inside the container; or just `docker compose pull`
-   the base image again.
+1. Удалить `letta-code-channels/patches/patch-debug-tagging.py`.
+2. Убрать вызов патча из `Dockerfile`.
+3. Пересобрать образ `letta-code-channels`.
+4. Оригинальный бандл (до патча) — в `letta.js.bak` внутри контейнера;
+   либо просто `docker compose pull` базовый образ.
 
-No production data depends on the tag.
+Никакие production-данные от тэга не зависят.
