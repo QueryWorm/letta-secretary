@@ -1,4 +1,4 @@
-"""TEMPORARY DEBUG PATCH: append [model: secretary-model | latency: Xs] to outgoing
+"""TEMPORARY DEBUG PATCH: append [secretary-model | X.Ys] to outgoing
 messages for the two user chat_ids.
 
 REMOVAL: delete this file and remove the invocation from Dockerfile, then rebuild.
@@ -11,7 +11,7 @@ s = p.read_text()
 
 WHITELIST = ("380975907324", "322910508")
 MODEL_NAME = "secretary-model"
-TAG_MARKER = "[model:"
+TAG_MARKER = "[secretary-model"
 
 # A) Record inbound timestamp in handleInboundMessage
 old_a = (
@@ -46,7 +46,7 @@ new_b = (
     "    const __tsMap = globalThis.__inboundTs;\n"
     f"    if (input && typeof input.message === \"string\" && input.action !== \"react\" && input.action !== \"remove\" && input.action !== \"download-file\" && !input.message.includes({TAG_MARKER!r}) && __whitelist.has(String(chatId)) && __tsMap && __tsMap.has(String(chatId))) {{\n"
     f"      const __lat = ((Date.now() - __tsMap.get(String(chatId))) / 1000).toFixed(1);\n"
-    f"      input.message = input.message + \"\\n\\n[model: {MODEL_NAME} | latency: \" + __lat + \"s]\";\n"
+    f"      input.message = input.message + \"\\n\\n[{MODEL_NAME} | \" + __lat + \"s]\";\n"
     "      __tsMap.delete(String(chatId));\n"
     "    }\n"
     "  } catch {}\n"
