@@ -53,10 +53,10 @@ services:
       OPENAI_API_KEY: dummy
       OPENAI_TRANSCRIPTION_BASE_URL: http://litellm:4000
       OPENAI_TRANSCRIPTION_MODEL: whisper
-      LETTA_INHERITED_CHANNEL_CONTEXT: '{"channelToolScope":{"channels":[{"channelId":"whatsapp","accountId":"f3ebe44a-27b7-4e92-a83f-030458a194d8"}]}}'
+      LETTA_INHERITED_CHANNEL_CONTEXT: '{"channelToolScope":{"channels":[{"channelId":"whatsapp","accountId":"f3ebe44a-27b7-4e92-a83f-030458a194d8"},{"channelId":"telegram","accountId":"beff2b65-16ce-49eb-9c14-1295604daaaa"}]}}'
     volumes:
       - letta-code-data:/root/.letta
-    command: ["server", "--channels", "whatsapp", "--debug"]
+    command: ["server", "--channels", "whatsapp,telegram", "--debug"]
     restart: unless-stopped
   litellm:
     image: ghcr.io/berriai/litellm:main-latest
