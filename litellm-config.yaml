@@ -1,7 +1,7 @@
 model_list:
   - model_name: secretary-model
     litellm_params:
-      model: openai/qwen3.7-plus
+      model: openai/grok-4.5
       api_base: https://opencode.ai/zen/go/v1
       api_key: os.environ/OPENCODE_GO_API_KEY
   - model_name: secretary-model-fallback
