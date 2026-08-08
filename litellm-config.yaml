@@ -1,13 +1,18 @@
 model_list:
   - model_name: secretary-model
     litellm_params:
+      model: openai/qwen3.7-plus
+      api_base: https://opencode.ai/zen/go/v1
+      api_key: os.environ/OPENCODE_GO_API_KEY
+  - model_name: secretary-model-fallback
+    litellm_params:
       model: groq/llama-3.3-70b-versatile
       api_key: os.environ/GROQ_API_KEY
-  - model_name: secretary-model-fallback
+  - model_name: secretary-model-fallback-2
     litellm_params:
       model: cerebras/gemma-4-31b
       api_key: os.environ/CEREBRAS_API_KEY
-  - model_name: secretary-model-fallback-2
+  - model_name: secretary-model-fallback-3
     litellm_params:
       model: sambanova/Meta-Llama-3.3-70B-Instruct
       api_key: os.environ/SAMBANOVA_API_KEY
@@ -34,3 +39,4 @@ litellm_settings:
     - secretary-model:
         - secretary-model-fallback
         - secretary-model-fallback-2
+        - secretary-model-fallback-3
