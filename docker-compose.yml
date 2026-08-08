@@ -15,6 +15,7 @@ services:
       OPENAI_API_BASE: http://litellm:4000/v1
       OPENAI_API_KEY: dummy
       GEMINI_API_KEY: ${GEMINI_API_KEY}
+      SAMBANOVA_API_KEY: ${SAMBANOVA_API_KEY}
       LETTA_API_KEY: ${LETTA_API_KEY}
       TZ: Europe/Kyiv
     ports:
@@ -22,6 +23,12 @@ services:
     depends_on:
       - letta-db
       - litellm
+    volumes:
+      - type: volume
+        source: letta-code-data
+        target: /root/.letta/channels
+        volume:
+          subpath: channels
     restart: unless-stopped
   searxng:
     image: searxng/searxng:latest
