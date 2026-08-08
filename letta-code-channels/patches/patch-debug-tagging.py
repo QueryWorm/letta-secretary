@@ -9,7 +9,11 @@ from pathlib import Path
 p = Path(sys.argv[1] if len(sys.argv) > 1 else "/usr/local/lib/node_modules/@letta-ai/letta-code/letta.js")
 s = p.read_text()
 
-WHITELIST = ("380975907324", "322910508")
+WHITELIST = (
+    "380975907324",
+    "380975907324@s.whatsapp.net",
+    "322910508",
+)
 MODEL_NAME = "secretary-model"
 TAG_MARKER = "[secretary-model"
 
