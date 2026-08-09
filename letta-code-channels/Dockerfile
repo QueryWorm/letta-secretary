@@ -46,6 +46,12 @@ RUN python3 /tmp/patch-turn-error.py && rm /tmp/patch-turn-error.py
 COPY patches/patch-debug-tagging.py /tmp/patch-debug-tagging.py
 RUN python3 /tmp/patch-debug-tagging.py && rm /tmp/patch-debug-tagging.py
 
+COPY patches/patch-allow-startup-errors.py /tmp/patch-allow-startup-errors.py
+RUN python3 /tmp/patch-allow-startup-errors.py && rm /tmp/patch-allow-startup-errors.py
+
+COPY patches/patch-channel-retry.py /tmp/patch-channel-retry.py
+RUN python3 /tmp/patch-channel-retry.py && rm /tmp/patch-channel-retry.py
+
 WORKDIR /root
 
 VOLUME ["/root/.letta"]
