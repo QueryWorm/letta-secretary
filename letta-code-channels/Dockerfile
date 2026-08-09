@@ -46,9 +46,6 @@ RUN python3 /tmp/patch-turn-error.py && rm /tmp/patch-turn-error.py
 COPY patches/patch-debug-tagging.py /tmp/patch-debug-tagging.py
 RUN python3 /tmp/patch-debug-tagging.py && rm /tmp/patch-debug-tagging.py
 
-COPY patches/patch-voice-attachment.py /tmp/patch-voice-attachment.py
-RUN python3 /tmp/patch-voice-attachment.py && rm /tmp/patch-voice-attachment.py
-
 WORKDIR /root
 
 VOLUME ["/root/.letta"]
