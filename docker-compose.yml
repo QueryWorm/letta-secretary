@@ -9,7 +9,8 @@ services:
       - ./pgdata:/var/lib/postgresql/data
     restart: unless-stopped
   letta-server:
-    image: letta/letta:latest
+    build: ./letta-server
+    image: letta-server:custom
     environment:
       LETTA_PG_URI: postgresql://letta:letta@letta-db:5432/letta
       OPENAI_API_BASE: http://litellm:4000/v1
