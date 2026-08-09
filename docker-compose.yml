@@ -17,6 +17,7 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       SAMBANOVA_API_KEY: ${SAMBANOVA_API_KEY}
       LETTA_API_KEY: ${LETTA_API_KEY}
+      TTS_BASE_URL: http://tts:8000
       TZ: Europe/Kyiv
     ports:
       - "8283:8283"
@@ -73,5 +74,15 @@ services:
     environment:
       TZ: Europe/Kyiv
       LITELLM_LOG: INFO
+  tts:
+    build: ./tts
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
 volumes:
   letta-code-data: {}
