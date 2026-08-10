@@ -85,5 +85,17 @@ services:
       timeout: 5s
       retries: 3
     restart: unless-stopped
+  rag-uploader:
+    build: ./rag-uploader
+    ports:
+      - "8081:8081"
+    environment:
+      LETTA_BASE_URL: http://letta-server:8283
+      LETTA_API_KEY: ${LETTA_API_KEY}
+      ARCHIVE_ID: archive-68b3e817-5b14-4bf0-a524-0808b530eac2
+      DEFAULT_CHUNK_SIZE: "2000"
+    depends_on:
+      - letta-server
+    restart: unless-stopped
 volumes:
   letta-code-data: {}
