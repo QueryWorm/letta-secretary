@@ -1,0 +1,47 @@
+model_list:
+  # Single primary model — Cerebras gemma-4-31b (fast, no reasoning, ~400ms)
+  - model_name: secretary-model
+    litellm_params:
+      model: cerebras/gemma-4-31b
+      api_key: os.environ/CEREBRAS_API_KEY
+  # Fallbacks ordered by speed
+  - model_name: secretary-model-fallback
+    litellm_params:
+      model: groq/llama-3.3-70b-versatile
+      api_key: os.environ/GROQ_API_KEY
+  - model_name: secretary-model-fallback-2
+    litellm_params:
+      model: sambanova/Meta-Llama-3.3-70B-Instruct
+      api_key: os.environ/SAMBANOVA_API_KEY
+  - model_name: secretary-model-fallback-3
+    litellm_params:
+      model: cerebras/gpt-oss-120b
+      api_key: os.environ/CEREBRAS_API_KEY
+  # Summarizer
+  - model_name: secretary-summarizer
+    litellm_params:
+      model: cerebras/gpt-oss-120b
+      api_key: os.environ/CEREBRAS_API_KEY
+  # Whisper for audio transcribe
+  - model_name: whisper
+    litellm_params:
+      model: groq/whisper-large-v3
+      api_key: os.environ/GROQ_API_KEY
+    model_info:
+      mode: audio_transcription
+  - model_name: text-embedding-3-large
+    litellm_params:
+      model: gemini/gemini-embedding-001
+      api_key: os.environ/GEMINI_API_KEY
+router_settings:
+  routing_strategy: usage-based-routing-v2
+  num_retries: 1
+litellm_settings:
+  drop_params: true
+  json_logs: true
+  success_callback: ["logging"]
+  fallbacks:
+    - secretary-model:
+        - secretary-model-fallback
+        - secretary-model-fallback-2
+        - secretary-model-fallback-3
